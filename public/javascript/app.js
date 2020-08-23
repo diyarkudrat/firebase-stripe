@@ -41,3 +41,17 @@ firebase.auth.onAuthStateChanged((user) => {
         firebaseUI.start('#firebaseui-auth-container', firebaseUiConfig);
     }
 });
+
+
+// Stripe Elements Setup
+const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+const elements = stripe.elements();
+const cardElement = elements.create('card');
+cardElement.mount('#card-element');
+cardElement.on('change', ({ error }) => {
+    if (error) {
+        displayError.textContent = error.message;
+    } else {
+        displayError.textContent = '';
+    }
+});
