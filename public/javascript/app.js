@@ -21,3 +21,23 @@ const firebaseUiConfig = {
     ],
     credentialHelper: firebaseui.auth.CredentialHelper.NONE,
 };
+
+firebase.auth.onAuthStateChanged((user) => {
+    if (user) {
+        currentUser = user
+        firebaseUI.firestore().collection('stripe_customers').doc(currentUser.uid)
+            .onSnapshot((snapshot) => {
+                if (snapshot.data()) {
+                    customerData = snapshot.data();
+                    startDataListeners();
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('content').style.display = 'block';
+                } else {
+                    console.log(`No Stripe customer found in Firestore for user: ${currentUser.uid}`)
+                };
+            });
+    } else {
+        document.getElementById('content').style.display = 'none';
+        firebaseUI.start('#firebaseui-auth-container', firebaseUiConfig);
+    }
+});
