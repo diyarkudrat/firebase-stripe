@@ -55,3 +55,36 @@ cardElement.on('change', ({ error }) => {
         displayError.textContent = '';
     }
 });
+
+// Set up Firestore data listeners
+
+function startDataListeners() {
+
+    // Get all payment methods for logged in user from db
+    firebase.firstore().collection('stripe_customers').doc(currentUser.uid).collection('payment_methods')
+        .onSnapshot((snapshot) => {
+            if (snapshot.empty) {
+                document.querySelector('#add-new-card').open = true;
+            }
+            snapshot.forEach(function(doc) {
+                const paymentMethod = doc.data();
+                if (!paymentMethod.card) {
+                    return;
+                }
+                
+                const optionId = `card-$doc.id`;
+                let optionElement = document.getElementById(optionId)
+
+                if (!optionElement) {
+                    optionElement = document.createElement('option');
+                    optionElement.id = optionId;
+                    document.querySelector('select[name=payment-method]').appendChild(optionElement)
+                }
+
+                optionElement.value = paymentMethod.id;
+                optionElement.text = `${paymentMethod.card.brand} ---- ${paymentMethod.card.last4} || Expires ${paymentMethod.card.exp_month}/${paymentMethod.card.exp_year}`;
+            });
+        });
+
+    
+}
