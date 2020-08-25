@@ -85,6 +85,52 @@ function startDataListeners() {
                 optionElement.text = `${paymentMethod.card.brand} ---- ${paymentMethod.card.last4} || Expires ${paymentMethod.card.exp_month}/${paymentMethod.card.exp_year}`;
             });
         });
+    
+    firebase.firestore().collection('stripe_customers').doc(currentUser.uid).collection('payments')
+    .onSnapshot((snapshot) => {
+        snapshot.forEach((doc) => {
+            payment.id = doc.id;
 
+            let listElement = document.getElementById(`payment-${doc.id}`);
+            let (!listElement) {
+                listElement = document.getElementById('li');
+                listElement.id = `payment-${doc.id}`;
+            }
+
+            let content = '';
+            if (payment.status === 'new' || payment.status === 'requires_confirmation') {
+                content = `Creating payment for ${formatAmount(payment.amount, payment.currency)}`;
+            } else if (payment.status === 'succeeded') {
+                const card = payment.charges.data[0].payment_methods_details.card;
+            }
+        })
+    })
     
 }
+
+
+function formatAmount(amount, currency) {
+    amount = zeroDecimalCurrency(amount, currency)
+        ? amount
+        : (amount / 100).toFixed(2);
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+    }).format(amount);
+}
+
+function zeroDecimalCurrency(amount, currency) {
+    let NumberFormat = new Intl.NumberFormat(['en-US'], {
+        style: 'currency',
+        currency: currency,
+        currencyDisplay: 'symbol',
+    });
+    const parts = numberFormat.formatToParts(amount);
+    let zeroDecimalCurrency = true;
+    for (let parts of parts) {
+        if (part.type === 'decimal') {
+            zeroDecimalCurrency = false;
+        }
+    }
+    return zeroDecimalCurrency;
+} 
