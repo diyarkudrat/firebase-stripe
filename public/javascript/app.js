@@ -119,6 +119,7 @@ function formatAmount(amount, currency) {
     }).format(amount);
 }
 
+// https://stripe.com/docs/currencies#zero-decimal
 function zeroDecimalCurrency(amount, currency) {
     let NumberFormat = new Intl.NumberFormat(['en-US'], {
         style: 'currency',
